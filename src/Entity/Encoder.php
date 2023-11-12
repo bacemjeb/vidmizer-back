@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EncoderRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EncoderRepository::class)]
+#[ApiResource]
 class Encoder
 {
     #[ORM\Id]
@@ -14,7 +16,7 @@ class Encoder
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $size = null;
+    private ?float $size = null;
 
     #[ORM\Column(length: 255)]
     private ?string $quality = null;
@@ -27,12 +29,12 @@ class Encoder
         return $this->id;
     }
 
-    public function getSize(): ?int
+    public function getSize(): ?float
     {
         return $this->size;
     }
 
-    public function setSize(int $size): static
+    public function setSize(float $size): static
     {
         $this->size = $size;
 

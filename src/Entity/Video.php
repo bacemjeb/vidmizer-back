@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\VideoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
+#[ApiResource]
 class Video
 {
     #[ORM\Id]
@@ -22,12 +24,15 @@ class Video
     private ?int $duration = null;
 
     #[ORM\Column]
-    private ?int $size = null;
+    private ?float $size = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $videoQuality = null;
+    private ?string $quality = null;
 
-    #[ORM\OneToMany(mappedBy: 'video', targetEntity: Folder::class)]
+    #[ORM\Column(nullable: true)]
+    private ?int $views = null;
+
+    #[ORM\ManyToMany(targetEntity: Folder::class, mappedBy: 'videos')]
     private Collection $folders;
 
     #[ORM\OneToMany(mappedBy: 'video', targetEntity: Encoder::class)]
@@ -68,26 +73,38 @@ class Video
         return $this;
     }
 
-    public function getSize(): ?int
+    public function getSize(): ?float
     {
         return $this->size;
     }
 
-    public function setSize(int $size): static
+    public function setSize(float $size): static
     {
         $this->size = $size;
 
         return $this;
     }
 
-    public function getVideoQuality(): ?string
+    public function getQuality(): ?string
     {
-        return $this->videoQuality;
+        return $this->quality;
     }
 
-    public function setVideoQuality(string $videoQuality): static
+    public function setQuality(string $quality): static
     {
-        $this->videoQuality = $videoQuality;
+        $this->quality = $quality;
+
+        return $this;
+    }
+
+    public function getViews(): ?int
+    {
+        return $this->views;
+    }
+
+    public function setViews(?int $views): static
+    {
+        $this->views = $views;
 
         return $this;
     }
@@ -104,7 +121,7 @@ class Video
     {
         if (!$this->folders->contains($folder)) {
             $this->folders->add($folder);
-            $folder->setVideo($this);
+            $folder->addVideo($this);
         }
 
         return $this;
@@ -113,10 +130,7 @@ class Video
     public function removeFolder(Folder $folder): static
     {
         if ($this->folders->removeElement($folder)) {
-            // set the owning side to null (unless already changed)
-            if ($folder->getVideo() === $this) {
-                $folder->setVideo(null);
-            }
+            $folder->removeVideo($this);
         }
 
         return $this;
