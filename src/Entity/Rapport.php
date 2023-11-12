@@ -3,15 +3,15 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Repository\FolderRepository;
+use App\Repository\RapportRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: FolderRepository::class)]
-#[ApiResource]
-class Folder
+#[ORM\Entity(repositoryClass: RapportRepository::class)]
+#[ApiResource(normalizationContext: ['groups' => ['rapport']])]
+class Rapport
 {
     #[Groups('rapport')]
     #[ORM\Id]
@@ -24,10 +24,7 @@ class Folder
     private ?string $name = null;
 
     #[Groups('rapport')]
-    #[ORM\Column(nullable: true)]
-    private ?int $views = null;
-
-    #[ORM\ManyToMany(targetEntity: Video::class, inversedBy: 'folders')]
+    #[ORM\ManyToMany(targetEntity: Video::class, inversedBy: 'rapports')]
     private Collection $videos;
 
     public function __construct()
@@ -72,18 +69,6 @@ class Folder
     public function removeVideo(Video $video): static
     {
         $this->videos->removeElement($video);
-
-        return $this;
-    }
-
-    public function getViews(): ?int
-    {
-        return $this->views;
-    }
-
-    public function setViews(?int $views): static
-    {
-        $this->views = $views;
 
         return $this;
     }

@@ -5,19 +5,23 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EncoderRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EncoderRepository::class)]
 #[ApiResource]
 class Encoder
 {
+    #[Groups('rapport')]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups('rapport')]
     #[ORM\Column]
     private ?float $size = null;
 
+    #[Groups('rapport')]
     #[ORM\Column(length: 255)]
     private ?string $quality = null;
 

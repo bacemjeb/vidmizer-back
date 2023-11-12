@@ -7,41 +7,54 @@ use App\Repository\VideoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
 #[ApiResource]
 class Video
 {
+    #[Groups('rapport')]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups('rapport')]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Groups('rapport')]
     #[ORM\Column]
     private ?int $duration = null;
 
+    #[Groups('rapport')]
     #[ORM\Column]
     private ?float $size = null;
 
+    #[Groups('rapport')]
     #[ORM\Column(length: 255)]
     private ?string $quality = null;
 
+    #[Groups('rapport')]
     #[ORM\Column(nullable: true)]
     private ?int $views = null;
 
+    #[Groups('rapport')]
     #[ORM\ManyToMany(targetEntity: Folder::class, mappedBy: 'videos')]
     private Collection $folders;
 
+    #[Groups('rapport')]
     #[ORM\OneToMany(mappedBy: 'video', targetEntity: Encoder::class)]
     private Collection $encoders;
+    
+    #[ORM\ManyToMany(targetEntity: Rapport::class, mappedBy: 'videos')]
+    private Collection $rapports;
 
     public function __construct()
     {
         $this->folders = new ArrayCollection();
         $this->encoders = new ArrayCollection();
+        $this->rapports = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -161,6 +174,33 @@ class Video
             if ($encoder->getVideo() === $this) {
                 $encoder->setVideo(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rapport>
+     */
+    public function getRapports(): Collection
+    {
+        return $this->rapports;
+    }
+
+    public function addRapport(Rapport $rapport): static
+    {
+        if (!$this->rapports->contains($rapport)) {
+            $this->rapports->add($rapport);
+            $rapport->addVideo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRapport(Rapport $rapport): static
+    {
+        if ($this->rapports->removeElement($rapport)) {
+            $rapport->removeVideo($this);
         }
 
         return $this;
