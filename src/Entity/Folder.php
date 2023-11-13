@@ -27,6 +27,10 @@ class Folder
     #[ORM\Column(nullable: true)]
     private ?int $views = null;
 
+    #[Groups('rapport')]
+    #[ORM\Column]
+    private ?int $uid = null;
+
     #[ORM\ManyToMany(targetEntity: Video::class, inversedBy: 'folders')]
     private Collection $videos;
 
@@ -84,6 +88,18 @@ class Folder
     public function setViews(?int $views): static
     {
         $this->views = $views;
+
+        return $this;
+    }
+
+    public function getUid(): ?int
+    {
+        return $this->uid;
+    }
+
+    public function setUid(int $uid): static
+    {
+        $this->uid = $uid;
 
         return $this;
     }
